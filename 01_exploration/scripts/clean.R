@@ -1,5 +1,7 @@
 library("tidyverse")
 
+src("scripts/utils.R")
+
 path <-"data/raw/"
 raw_list <- list.files(path)
 
@@ -25,7 +27,7 @@ main2021 <- raw_data_list[2] %>% as.data.frame() %>%
 
 
 
-#--- BREAKDOWN PER PARAMETER ---
+#--- BREAKDOWN PER INDICATOR ---
 
 # Role (Analytical vs Creative)
 # Variables: RoleAsEmployee (priority), RoleAsFreelance (if priority not available)
@@ -66,41 +68,6 @@ experience_tally <- bind_rows(
 
 # Income Group (Commoner vs Elite)
 # Variables: PayAnnual (priority), PayHourly (if priority not available)
-# hours_per_year <- 8 * 20 * 12
-# pay_annual_uq <- main2021 %>% select(PayAnnual) %>%
-#   unique() %>% pull() %>% as.character()
-# convert_to_yearly <- function(str) {
-#   range_hourly <- str_extract_all(str, "[0-9]+") %>% 
-#     unlist() %>% as.numeric()
-#   mean_annual <- mean(range_hourly) * hours_per_year
-#   
-#   for(ann in pay_annual_uq) {
-#     range_result <- ""
-#     range_annual <-  str_extract_all(ann, "[0-9]+\\,[0-9]+") %>%
-#       unlist() %>% 
-#       str_replace_all(",", "") %>%
-#       as.numeric()
-#     
-#     if(length(range_annual) > 0) {
-#       if(length(range_annual) == 2){
-#         if(mean_annual >= range_annual[1] && mean_annual <= range_annual[2]) {
-#           range_result <- ann
-#         }
-#       } else if(length(range_annual) == 1){
-#         # if(str_detect(ann, "Less")) {
-#         #   print ("Less")
-#         # } else if (str_detect(ann, "more")) {
-#         #   print ("more")
-#         # }
-#         range_result <- ann
-#       }
-#     } else {
-#       range_result <- ""
-#     }
-#   }
-#   return (range_result)
-# }
-# convert_to_yearly("Less than $15")
 
 income <- main2021 %>% select(PayAnnual, PayHourly) %>%
   count(PayAnnual) %>%
@@ -113,6 +80,15 @@ income_tally <- bind_rows(
   income[2,], # 240k more
   income[16,]) %>% # Not compensated yearly
   filter(PayAnnual != "", PayAnnual != "I am not compensated on a yearly basis")
+
+income_tally_proxy <- income_tally %>%
+  # 250k proxy value to match with GroupedMedian function
+  mutate(PayAnnual = recode(income_tally$PayAnnual, 
+                            `Less than $10,000` = "$0 - $10,000", 
+                            `$240,000 or more` = "$240,000 - $250,000")) %>%
+  mutate(PayAnnual = str_replace_all(PayAnnual, "[\\$\\,\\s]", ""))
+  # mutate(PayAnnualSplit = str_extract_all(PayAnnual, "[0-9]+", simplify = T)) %>%
+  # mutate(PayAnnualMean = mean(PayAnnualSplit %>% as.numeric()))
 
 
 # Commitment (Hobbyist vs Professional)
@@ -139,16 +115,19 @@ commitment <- main2021 %>% select(DVRoles_Freelance,
   mutate(professional_count = if_else(DVRoles_Employee == EMPLOYEE, 1, 0) +
            if_else(DVRoles_Freelance == FREELANCE, 1, 0) + 
            if_else(DVRoles_Academic == ACADEMIC, 1, 0)) %>%
-  mutate(leaning = if_else(hobbyist_count > professional_count, "hobbyist", if_else(
+  mutate(commitment = if_else(hobbyist_count > professional_count, "hobbyist", if_else(
     hobbyist_count < professional_count, "professional", "ambiguous"
   )))
 
-commitment_tally <- commitment %>% count(leaning)
-
+commitment_tally <- commitment %>% count(commitment)
 
 
 
 #--- BREAKDOWN PER TRIBE ---
+
+# Role vars
+
+# Experience vars
 yearsexp_median <- experience_tally %>% filter(n == median(experience_tally$n)) %>%
   select(YearsDVExperience) %>% pull() %>% as.character()
 yearsexp_med_idx <- which(experience_tally$YearsDVExperience == yearsexp_median)
@@ -157,8 +136,21 @@ juniors <- experience_tally[1:yearsexp_med_idx,]$YearsDVExperience %>% unique() 
 seniors <- experience_tally %>% filter(!(YearsDVExperience %in% juniors)) %>% select(YearsDVExperience) %>%
   pull() %>% unique() %>% as.character()
 
-income_med_idx <- which.min(abs(income_tally$n - (median(income_tally %>% 
-                                        select(n) %>% pull()) + 1))) # Added 1 to locate the actual median
+# Income vars
+income_median <- GroupedMedian(income_tally_proxy$n, income_tally_proxy$PayAnnual, sep="-")
+is_income_med_range <- function(str) {
+  income_range <- str_split(str, "-") %>% unlist() %>% as.numeric()
+  return (income_median >= income_range[1] && income_median < income_range[2])
+}
+income_med_range <- income_tally_proxy$PayAnnual[1]
+income_med_idx <- 1
+for(i in 1:nrow(income_tally_proxy)){
+  if (is_income_med_range(income_tally_proxy$PayAnnual[i])) {
+    income_med_range <- income_tally_proxy$PayAnnual[i]
+    income_med_idx <- i
+  }
+}
+
 humbly_paid <- income_tally[1:income_med_idx,]$PayAnnual %>% unique() %>% as.character()
 well_paid <- income_tally %>% filter(!(PayAnnual %in% humbly_paid)) %>% select(PayAnnual) %>%
   pull() %>% unique() %>% as.character()
@@ -171,9 +163,30 @@ tribe <- main2021 %>%
   mutate(RoleType = if_else(RoleAny != "", RoleType, "unknown") %>% as.factor()) %>%
   # By years experience
   mutate(YearsDVExperience = if_else(YearsDVExperience != "", YearsDVExperience, YearsWorkExperience)) %>%
-  mutate(Experience = if_else(YearsDVExperience %in% seniors, "senior", "junior") %>% as.factor())
+  mutate(Experience = if_else(YearsDVExperience %in% seniors, "senior", "junior") %>% as.factor()) %>%
   # By income group
-  mutate(IncomeGroup = if_else(PayAnnual ))
-  
-  
+  mutate(IncomeGroup = if_else(PayAnnual %in% well_paid, "well-paid", 
+                               if_else(PayAnnual %in% humbly_paid, "humbly-paid", "unknown")) %>% 
+           as.factor()) %>%
+  # By commitment
+  mutate(HobbyistCount = if_else(DVRoles_Hobbyist == HOBBYIST, 4, 0) +
+           if_else(DVRoles_Freelance == FREELANCE, 3, 0) +
+           if_else(DVRoles_Student == STUDENT, 2, 0) +
+           if_else(DVRoles_PassiveIncome == PASSIVE, 1, 0)) %>%
+  mutate(ProfessionalCount = if_else(DVRoles_Employee == EMPLOYEE, 1, 0) +
+           if_else(DVRoles_Academic == ACADEMIC, 1, 0)) %>%
+  mutate(Commitment = if_else(HobbyistCount > ProfessionalCount, "hobbyist", if_else(
+    HobbyistCount < ProfessionalCount, "professional", "ambiguous"
+  )) %>% as.factor())
 
+tribe_clean <- tribe %>%
+  select(RoleType, Experience, IncomeGroup, Commitment) %>%
+  # Remove ambiguous and unknown values
+  filter(RoleType != "ambiguous", RoleType != "unknown") %>%
+  filter(IncomeGroup != "unknown") %>%
+  filter(Commitment != "ambiguous")
+
+tribe_tally <- tribe_clean %>%
+  group_by(Experience, RoleType, IncomeGroup, Commitment) %>%
+  count() %>% arrange(desc(n)) %>%
+  mutate(nPerc = n/nrow(tribe_clean) * 100)
