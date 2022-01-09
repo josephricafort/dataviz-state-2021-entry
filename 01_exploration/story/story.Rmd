@@ -1,0 +1,120 @@
+---
+title: "Which DVS tribe do you belong?"
+output: html_notebook
+---
+
+The DVS community is a diverse community made up of people from different backgrounds, demographics and experiences. Have you ever wondered what could be the different possible profiles that are made up of this community and which of these profiles do you identify yourself the closest to?
+
+Let's look at the 4 different indicators and mix-match them to create different profiles of what the DVS population are made out of:
+
+* **Years of experience** (Junior vs Senior)
+* **Role** (Creative vs Analytical)
+* **Income group** (Humbly-paid vs Well-paid)
+* **Commitment** (Hobbyist vs Professional)
+
+#### Percentage distribution of tribes according to different combination of indicators
+```{r}
+library("tidyverse")
+src("scripts/clean.R")
+
+tribe_tally
+
+tribe_plot <- tribe_tally %>% 
+         mutate(group = paste(Experience, RoleType, IncomeGroup, Commitment)) %>%
+         mutate(group = fct_reorder(group, n))
+
+ggplot(tribe_plot, aes(reorder(group, nPerc), nPerc)) + 
+  geom_col() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  coord_flip()
+  
+```
+
+
+## Years of experience (Junior vs Senior)
+
+Median years of experience is 6 years. You are considered a **junior** if your DV experience is less than 6 years, while **senior** if more than 6 years.
+```{r}
+experience_sorted
+
+ggplot(experience_sorted, aes(YearsDVExperience, weight = n)) + 
+  geom_bar() +
+  coord_flip()
+
+```
+
+## Role (Creative vs Analytical)
+
+Around 44% of the DVS members have analytical-leaning roles while only 14% belong to the creative-leaning roles. Meanwhile, some roles have been categorised as ambiguous and could hardly be categorized such as leadership and cartography. They comprise 18% of the DVS population. 22% chose to not indicate their roles.
+
+While roles are usually either creative or analytical in function and purpose, we attempt to classify roles that are more likely leaning towards either of them.
+
+### Creative
+Roles that lean more towards creative or humanities related subjects:
+
+* Designer
+* Journalist
+* Teacher
+
+### Analytical
+Roles that lean more toward analytical or rational related subjects:
+
+* Analyst
+* Developer
+* Scientist
+* Engineer
+
+### Ambiguous
+Classified into both categories as they are leaning almost equally on both sides:
+
+* Leadership (Manager, Director, VP, etc.)
+* Cartographer
+
+
+#### 44% are Analytical and less than half of it are Creatives
+```{r} 
+role_tally
+
+```
+
+```{r} 
+ggplot(role_tally %>% filter(RoleType != "unknown"), aes(RoleType, weight = nPerc)) +
+  geom_bar() +
+  coord_flip()
+
+```
+## Income group (Humbly-paid vs Well-paid)
+
+Median annual income is at $81,300. You are considered **humbly-paid** if your'e annual income falls below the median annual income and **well-paid** if above it.
+```{r}
+income_sorted
+
+ggplot(income_sorted, aes(PayAnnual, weight = n)) +
+  geom_bar() +
+  coord_flip()
+```
+
+## Commitment (Hobbyist vs Professional)
+
+### Hobbyists
+
+Hobbyists are those who do datavis driven with passion and perseverance. They're group together who lean towards:
+
+* Worked on a non-paid project 
+* Worked as a freelancer / consultant 
+* A student 
+* Earning passive income from datavis projects 
+
+### Professionals
+Professionals are those who are lean towards working as an employee or working in the academe as a teacher.
+
+#### Near 2/3 are professionals while more than 1/3 are hobbyists
+```{r}
+commitment_tally
+```
+#### Hobbyists vs Professionals (and Ambiguous) distribution
+```{r}
+ggplot(commitment_tally, aes(Commitment, weight = n)) +
+  geom_bar() + 
+  coord_flip()
+```
