@@ -1,6 +1,6 @@
 # Utility functions
 
-GroupedMedian <- function(frequencies, intervals, sep = NULL, trim = NULL) {
+grouped_median <- function(frequencies, intervals, sep = NULL, trim = NULL) {
   # If "sep" is specified, the function will try to create the 
   #   required "intervals" matrix. "trim" removes any unwanted 
   #   characters before attempting to convert the ranges to numeric.

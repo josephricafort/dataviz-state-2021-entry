@@ -15,7 +15,7 @@ Let's look at the 4 different indicators and mix-match them to create different 
 #### Percentage distribution of tribes according to different combination of indicators
 ```{r}
 library("tidyverse")
-src("scripts/clean.R")
+source("scripts/clean.R")
 
 tribe_tally
 
@@ -25,7 +25,6 @@ tribe_plot <- tribe_tally %>%
 
 ggplot(tribe_plot, aes(reorder(group, nPerc), nPerc)) + 
   geom_col() +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
   coord_flip()
   
 ```
@@ -47,7 +46,7 @@ ggplot(experience_sorted, aes(YearsDVExperience, weight = n)) +
 
 Around 44% of the DVS members have analytical-leaning roles while only 14% belong to the creative-leaning roles. Meanwhile, some roles have been categorised as ambiguous and could hardly be categorized such as leadership and cartography. They comprise 18% of the DVS population. 22% chose to not indicate their roles.
 
-While roles are usually either creative or analytical in function and purpose, we attempt to classify roles that are more likely leaning towards either of them.
+While roles are usually requires to be both creative or analytical in function and purpose, we attempt to classify roles that are more likely leaning towards either of them.
 
 ### Creative
 Roles that lean more towards creative or humanities related subjects:
@@ -114,7 +113,46 @@ commitment_tally
 ```
 #### Hobbyists vs Professionals (and Ambiguous) distribution
 ```{r}
-ggplot(commitment_tally, aes(Commitment, weight = n)) +
+ggplot(commitment_tally, aes(Commitment, weight = nPerc)) +
   geom_bar() + 
   coord_flip()
+```
+
+## Additional indicators - Tools for DV, Charts used and Frustrations
+```{r}
+source("scripts/add_indicators.R")
+tribe_tools
+tribe_charts
+tribe_frustrations
+```
+
+### Tools for DV per tribe
+
+```{r, fig.width=12, fig.height=20}
+tribe_tools
+
+ggplot(tribe_tools, aes(tools_for_dv_vars, percN)) +
+  geom_col() +
+  coord_flip() +
+  facet_wrap(vars(tribe_desc))
+```
+
+### Charts used per tribe
+```{r, fig.width=12, fig.height=20}
+tribe_charts
+
+ggplot(tribe_charts, aes(charts_used_vars, percN)) +
+  geom_col() +
+  coord_flip() +
+  facet_wrap(vars(tribe_desc))
+```
+
+### Top frustrations per tribe
+```{r, fig.width=12, fig.height=20}
+tribe_frustrations
+
+ggplot(tribe_frustrations, aes(top_frustrations_vars, percN)) +
+  geom_col() +
+  coord_flip() +
+  facet_wrap(vars(tribe_desc))
 ```
