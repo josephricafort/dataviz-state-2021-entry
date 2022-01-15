@@ -9,6 +9,10 @@ charts_used_names
 charts_used_vars
 top_frustrations_names
 top_frustrations_vars
+top_issues_names
+top_issues_vars
+org_sector_names
+org_sector_vars
 
 path <-"data/raw/"
 raw_list <- list.files(path)
@@ -39,7 +43,9 @@ main2021 <- raw_data_list[2] %>% as.data.frame() %>%
   select(all_of(main_cols), 
          all_of(tools_for_dv_vars), 
          all_of(charts_used_vars), 
-         all_of(top_frustrations_vars)) %>%
+         all_of(top_frustrations_vars),
+         all_of(top_issues_vars),
+         all_of(org_sector_vars)) %>%
   mutate_at(vars(YearsDVExperience, YearsWorkExperience), function(x){ str_replace_all(x, "â€“", "-") }) %>%
   mutate_all( function(x){ as.factor(x) })
 
@@ -51,20 +57,20 @@ main2021 <- raw_data_list[2] %>% as.data.frame() %>%
 # Variables: RoleAsEmployee (priority), RoleAsFreelance (if priority not available)
 
 creative_types <- c("Designer", "Journalist", "Teacher", "Cartographer")
-analytical_types <- c("Analyst", "Developer", "Scientist", "Engineer")
-ambiguous_types <- c("Leadership (Manager, Director, VP, etc.)")
+analytical_types <- c("Analyst", "Developer", "Scientist", "Engineer", "Leadership (Manager, Director, VP, etc.)")
+ambiguous_types <- c("None of these describes my role", "")
 
 role <- main2021 %>% select(RoleAsEmployee, RoleAsFreelance) %>%
   mutate(RoleAny = if_else(RoleAsEmployee != "", RoleAsEmployee, RoleAsFreelance)) %>%
   count(RoleAny) %>%
   arrange(desc(n)) %>%
   mutate(RoleType = if_else(RoleAny %in% creative_types, "creative",
-                            if_else(RoleAny %in% analytical_types, "analytical", "ambiguous"))) %>%
-  mutate(RoleType = if_else(RoleAny != "", RoleType, "unknown"))
+                            if_else(RoleAny %in% analytical_types, "analytical", "unknown")))
+  # mutate(RoleType = if_else(RoleAny != "", RoleType, "unknown"))
   
 role_tally <- role %>% count(RoleType, wt = n) %>%
   mutate(RoleType = as.factor(RoleType)) %>%
-  mutate(RoleType = fct_relevel(RoleType, c("analytical", "ambiguous", "creative", "unknown"))) %>%
+  mutate(RoleType = fct_relevel(RoleType, c("analytical", "creative", "unknown"))) %>%
   mutate(nPerc = n/sum(n) * 100) %>%
   arrange(RoleType)
 
@@ -87,10 +93,6 @@ experience_tally <- experience %>%
 experience_tally <- bind_rows(
   experience_tally[12,], # Less 1 year
   experience_tally[-c(12),])
-experience_sorted <- experience_tally %>%
-  mutate(YearsDVExperience = fct_relevel(
-    experience_tally$YearsDVExperience, 
-    experience_tally$YearsDVExperience %>% as.character()))
 
 experience_tally_proxy <- experience_tally %>%
   mutate(YearsDVExperience = recode(
@@ -101,12 +103,17 @@ experience_tally_proxy <- experience_tally %>%
     `3` = "3-4",
     `4` = "4-5",
     `5` = "5-6",
+    `6–10` = "6-10",
+    `11–15` = "11-15",
+    `16–20` = "16-20",
+    `21–25` = "21-25",
+    `26–30` = "26-30",
     `More than 30` = "30-35" # 35 proxy to make work with grouped_median function
-    ))
+    ) %>% as.character())
 
-yearsexp_median <- grouped_median(experience_tally_proxy$n,
-                                 experience_tally_proxy$YearsDVExperience,
-                                 sep="-")
+yearsexp_median <- grouped_median(frequencies = experience_tally_proxy$n,
+                                 intervals = experience_tally_proxy$YearsDVExperience,
+                                 sep = "-")
 yearsexp_med_range <- experience_tally_proxy$YearsDVExperience[1]
 yearsexp_med_idx <- 1
 for(i in 1:nrow(experience_tally_proxy)){
@@ -120,6 +127,13 @@ for(i in 1:nrow(experience_tally_proxy)){
 juniors <- experience_tally[1:yearsexp_med_idx,]$YearsDVExperience %>% unique() %>% as.character()
 seniors <- experience_tally %>% filter(!(YearsDVExperience %in% juniors)) %>% select(YearsDVExperience) %>%
   pull() %>% unique() %>% as.character()
+
+experience_sorted <- experience_tally %>%
+  mutate(YearsDVExperience = fct_relevel(
+    experience_tally$YearsDVExperience, 
+    experience_tally$YearsDVExperience %>% as.character())) %>%
+  mutate(experience = if_else(row_number() <= yearsexp_med_idx, "junior", "senior") %>%
+           as.factor())
 
 
 # Income Group (Commoner vs Elite)
@@ -136,10 +150,6 @@ income_tally <- bind_rows(
   income[2,], # 240k more
   income[16,]) %>% # Not compensated yearly
   filter(PayAnnual != "", PayAnnual != "I am not compensated on a yearly basis")
-
-income_sorted <- income_tally %>%
-  mutate(PayAnnual = fct_relevel(income_tally$PayAnnual,
-                                 income_tally$PayAnnual %>% as.character()))
 
 income_tally_proxy <- income_tally %>%
   # 250k proxy value to match with grouped_median function
@@ -164,6 +174,11 @@ for(i in 1:nrow(income_tally_proxy)){
 humbly_paid <- income_tally[1:income_med_idx,]$PayAnnual %>% unique() %>% as.character()
 well_paid <- income_tally %>% filter(!(PayAnnual %in% humbly_paid)) %>% select(PayAnnual) %>%
   pull() %>% unique() %>% as.character()
+
+income_sorted <- income_tally %>%
+  mutate(PayAnnual = fct_relevel(income_tally$PayAnnual,
+                                 income_tally$PayAnnual %>% as.character())) %>%
+  mutate(income_group = if_else(row_number() <= income_med_idx, "humblypaid", "wellpaid"))
 
 
 # Commitment (Hobbyist vs Employee)
@@ -213,7 +228,17 @@ charts_used_vars # c("ChartsUsed_Line", "ChartsUsed_Bar"...
 top_frustrations_names # c("Lack of time"...
 top_frustrations_vars # c("TopFrustrationsDV_LackTime"...
 
-all_add_vars <- c(tools_for_dv_vars, charts_used_vars, top_frustrations_vars)
+top_issues_names # c('Lack of awareness of the impact of dataviz'...
+top_issues_vars # c("TopIssuesDV_LackAwarenessOfDVImpact"...
+
+org_sector_names # c("Journalism...
+org_sector_vars # c("OrgSector_Journalism...
+
+all_add_vars <- c(tools_for_dv_vars, 
+                  charts_used_vars, 
+                  top_frustrations_vars, 
+                  top_issues_vars,
+                  org_sector_vars)
 
 
 
@@ -251,7 +276,9 @@ tribe_clean <- tribe %>%
   select(RoleType, Experience, IncomeGroup, Commitment, 
          all_of(tools_for_dv_vars),
          all_of(charts_used_vars),
-         all_of(top_frustrations_vars)) %>%
+         all_of(top_frustrations_vars),
+         all_of(top_issues_vars),
+         all_of(org_sector_vars)) %>%
   # Remove ambiguous and unknown values
   filter(RoleType != "ambiguous", RoleType != "unknown") %>%
   filter(IncomeGroup != "unknown") %>%

@@ -24,7 +24,7 @@ tribe_plot <- tribe_tally %>%
          mutate(group = fct_reorder(group, n))
 
 ggplot(tribe_plot, aes(reorder(group, nPerc), nPerc)) + 
-  geom_col() +
+  geom_col(fill = "blue") +
   coord_flip()
   
 ```
@@ -36,7 +36,7 @@ Median years of experience is 6 years. You are considered a **junior** if your D
 ```{r}
 experience_sorted
 
-ggplot(experience_sorted, aes(YearsDVExperience, weight = n)) + 
+ggplot(experience_sorted, aes(YearsDVExperience, weight = n, fill = experience)) + 
   geom_bar() +
   coord_flip()
 
@@ -54,6 +54,7 @@ Roles that lean more towards creative or humanities related subjects:
 * Designer
 * Journalist
 * Teacher
+* Cartographer
 
 ### Analytical
 Roles that lean more toward analytical or rational related subjects:
@@ -62,12 +63,7 @@ Roles that lean more toward analytical or rational related subjects:
 * Developer
 * Scientist
 * Engineer
-
-### Ambiguous
-Classified into both categories as they are leaning almost equally on both sides:
-
 * Leadership (Manager, Director, VP, etc.)
-* Cartographer
 
 
 #### 44% are Analytical and less than half of it are Creatives
@@ -76,8 +72,9 @@ role_tally
 
 ```
 
-```{r} 
-ggplot(role_tally %>% filter(RoleType != "unknown"), aes(RoleType, weight = nPerc)) +
+```{r, fig.width=10, fig.height=1.5} 
+ggplot(role_tally %>% filter(RoleType != "unknown"), 
+       aes(RoleType, weight = nPerc, fill = RoleType)) +
   geom_bar() +
   coord_flip()
 
@@ -88,14 +85,14 @@ Median annual income is at $81,300. You are considered **humbly-paid** if your'e
 ```{r}
 income_sorted
 
-ggplot(income_sorted, aes(PayAnnual, weight = n)) +
+ggplot(income_sorted, aes(PayAnnual, weight = n, fill = income_group)) +
   geom_bar() +
   coord_flip()
 ```
 
-## Commitment (Hobbyist vs Professional)
+## Commitment (Hobbyist vs Employee)
 
-### Hobbyists
+### Hobbyist
 
 Hobbyists are those who do datavis driven with passion and perseverance. They're group together who lean towards:
 
@@ -104,7 +101,7 @@ Hobbyists are those who do datavis driven with passion and perseverance. They're
 * A student 
 * Earning passive income from datavis projects 
 
-### Professionals
+### Employee
 Professionals are those who are lean towards working as an employee or working in the academe as a teacher.
 
 #### Near 2/3 are professionals while more than 1/3 are hobbyists
@@ -112,8 +109,8 @@ Professionals are those who are lean towards working as an employee or working i
 commitment_tally
 ```
 #### Hobbyists vs Professionals (and Ambiguous) distribution
-```{r}
-ggplot(commitment_tally, aes(Commitment, weight = nPerc)) +
+```{r, fig.width=10, fig.height=2}
+ggplot(commitment_tally, aes(Commitment, weight = nPerc, fill = Commitment)) +
   geom_bar() + 
   coord_flip()
 ```
@@ -126,33 +123,79 @@ tribe_charts
 tribe_frustrations
 ```
 
-### Tools for DV per tribe
+### Tool preferences per tribe (Top 10 tools overall)
 
-```{r, fig.width=12, fig.height=20}
+```{r, fig.width=12, fig.height=10}
 tribe_tools
+tools_top10
 
-ggplot(tribe_tools, aes(tools_for_dv_vars, percN)) +
+ggplot(tribe_tools %>% 
+         filter(tools_for_dv_vars %in% tools_top10), 
+       aes(tools_for_dv_names, percN, fill = tools_for_dv_type)) +
+  geom_col() +
+  coord_flip() +
+  facet_wrap(vars(tribe_desc))
+```
+#### Observations
+* Among the junior-analyticals, the humblypaids' use excel as top tool while the wellpaids' use Tableau. Does this imply that Tableau is for the well-offs? Do they
+* Humblypaid creatives proudly shows their affinity for illustrator and it's just so obvious with the charts.
+* Unanimously, any tribe seems to use Excel as their top tool for DV.
+* Junior creative hobbyists tend to use R as either 2nd or 3rd tool.
+
+```{r, fig.width = 10, fig.height = 10}
+# ggplot(tribe_tools %>% 
+#          ungroup() %>%
+#          group_by(tribe_desc) %>%
+#          top_n(5, n) %>% ungroup(), aes(tools_for_dv_vars, percN, color = tribe_desc)) +
+#   geom_point() +
+#   coord_flip()
+```
+
+
+### How endemic tribes are per industry?
+```{r, fig.width=12, fig.height=10}
+tribe_orgsec
+
+ggplot(tribe_orgsec, aes(org_sector_names, n, fill = org_sector_category)) +
   geom_col() +
   coord_flip() +
   facet_wrap(vars(tribe_desc))
 ```
 
-### Charts used per tribe
-```{r, fig.width=12, fig.height=20}
-tribe_charts
-
-ggplot(tribe_charts, aes(charts_used_vars, percN)) +
-  geom_col() +
-  coord_flip() +
-  facet_wrap(vars(tribe_desc))
-```
 
 ### Top frustrations per tribe
-```{r, fig.width=12, fig.height=20}
+```{r, fig.width=12, fig.height=10}
 tribe_frustrations
 
-ggplot(tribe_frustrations, aes(top_frustrations_vars, percN)) +
+ggplot(tribe_frustrations %>%
+         filter(top_frustrations_vars %in% frustrations_top10), 
+       aes(top_frustrations_names, percN, fill = top_frustrations_type)) +
   geom_col() +
   coord_flip() +
   facet_wrap(vars(tribe_desc))
 ```
+#### Observations
+* Junior-analyticals looks unanimous in their frustrations, the lask of design expertise. For junior-analytical-wellpaid-hobbyist, it is their second frustration to lack of time.
+* Junior-creatives' top frustration seems to be the lack of time. It is third for humblypaid-employees and wellpaid-hobbyists where their top frustrations is in the lack of technical skills.
+* Junior-creative-wellpaid-hobbyists, which is the rarest tribe, mention that a lack of tech skillw (1st) and lacking mentorship (2nd) are their main frustrations.
+* Senior analyticals are unaninous with the lack of time as their top frustrations along with creatives humblypaid-hobbyist and wellpaid-employee.
+* Senior-creative-humbly-paid employees notes that the lack of recpect and tech limitations are their top frustrations.
+
+
+### Top issues per tribe
+```{r, fig.width=12, fig.height=10}
+tribe_issues
+
+ggplot(tribe_issues %>%
+         filter(top_issues_vars %in% top_issues_top10), 
+       aes(top_issues_names, percN, fill = top_issues_type)) +
+  geom_col() +
+  coord_flip() +
+  facet_wrap(vars(tribe_desc))
+```
+#### Observations
+* Unanimously lack of literacy for majority regardless of tribe. Second to it is the lack of awareness of impact of data visualization
+* If we try to remove the top 2 
+
+
+

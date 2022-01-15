@@ -8,7 +8,7 @@ grouped_median <- function(frequencies, intervals, sep = NULL, trim = NULL) {
     if (is.null(trim)) pattern <- ""
     else if (trim == "cut") pattern <- "\\[|\\]|\\(|\\)"
     else pattern <- trim
-    intervals <- sapply(strsplit(gsub(pattern, "", intervals), sep), as.numeric)
+    intervals <- sapply(str_split(gsub(pattern, "", intervals), sep), as.numeric)
   }
   
   Midpoints <- rowMeans(intervals)
