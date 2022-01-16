@@ -78,8 +78,6 @@ role_tally <- role %>% count(RoleType, wt = n) %>%
 # Years of Experience (Junior vs Senior)
 # Variables: YearsDVExperience (priority), YearsWorkExperience (if priority not available)
 
-
-
 experience <- main2021 %>% select(YearsDVExperience, YearsWorkExperience) %>%
   # mutate_all(function(x){ str_replace_all(x, "â€“", "-") }) %>%
   mutate(YearsDVExperience = if_else(YearsDVExperience != "", YearsDVExperience, YearsWorkExperience)) %>%
@@ -181,7 +179,7 @@ income_sorted <- income_tally %>%
   mutate(income_group = if_else(row_number() <= income_med_idx, "humblypaid", "wellpaid"))
 
 
-# Commitment (Hobbyist vs Employee)
+# Commitment (Independent vs Associate)
 # Variables: DVRoles_Freelance,	DVRoles_Employee,	DVRoles_Hobbyist,
 # DVRoles_Student,	DVRoles_Academic,	DVRoles_PassiveIncome
 
@@ -199,19 +197,19 @@ commitment <- main2021 %>% select(DVRoles_Freelance,
                                   DVRoles_Student,
                                   DVRoles_Academic,
                                   DVRoles_PassiveIncome) %>%
-  mutate(HobbyistCount = if_else(DVRoles_Hobbyist == HOBBYIST, 4, 0) +
+  mutate(IndependentCount = if_else(DVRoles_Hobbyist == HOBBYIST, 4, 0) +
            if_else(DVRoles_Freelance == FREELANCE, 3, 0) +
            if_else(DVRoles_Student == STUDENT, 2, 0) +
            if_else(DVRoles_PassiveIncome == PASSIVE, 1, 0)) %>%
-  mutate(EmployeeCount = if_else(DVRoles_Employee == EMPLOYEE, 1, 0) +
+  mutate(AssociateCount = if_else(DVRoles_Employee == EMPLOYEE, 1, 0) +
            if_else(DVRoles_Academic == ACADEMIC, 1, 0)) %>%
-  mutate(Commitment = if_else(HobbyistCount > EmployeeCount, "hobbyist", if_else(
-    HobbyistCount < EmployeeCount, "employee", "ambiguous"
+  mutate(Commitment = if_else(IndependentCount > AssociateCount, "independent", if_else(
+    IndependentCount < AssociateCount, "associate", "ambiguous"
   )) %>% as.factor())
   
 commitment_tally <- commitment %>% count(Commitment) %>%
   mutate(nPerc = n/sum(n) * 100) %>%
-  mutate(Commitment = fct_relevel(Commitment, c("hobbyist", "ambiguous", "employee")))
+  mutate(Commitment = fct_relevel(Commitment, c("independent", "ambiguous", "associate")))
 
 
 
@@ -259,14 +257,14 @@ tribe <- main2021 %>%
                                if_else(PayAnnual %in% humbly_paid, "humblypaid", "unknown")) %>% 
            as.factor()) %>%
   # By commitment
-  mutate(HobbyistCount = if_else(DVRoles_Hobbyist == HOBBYIST, 4, 0) +
+  mutate(IndependentCount = if_else(DVRoles_Hobbyist == HOBBYIST, 4, 0) +
            if_else(DVRoles_Freelance == FREELANCE, 3, 0) +
            if_else(DVRoles_Student == STUDENT, 2, 0) +
            if_else(DVRoles_PassiveIncome == PASSIVE, 1, 0)) %>%
-  mutate(EmployeeCount = if_else(DVRoles_Employee == EMPLOYEE, 1, 0) +
+  mutate(AssociateCount = if_else(DVRoles_Employee == EMPLOYEE, 1, 0) +
            if_else(DVRoles_Academic == ACADEMIC, 1, 0)) %>%
-  mutate(Commitment = if_else(HobbyistCount > EmployeeCount, "hobbyist", if_else(
-    HobbyistCount < EmployeeCount, "employee", "ambiguous"
+  mutate(Commitment = if_else(IndependentCount > AssociateCount, "independent", if_else(
+    IndependentCount < AssociateCount, "associate", "ambiguous"
   )) %>% as.factor()) %>%
   # Additional indicators
   # By tools for dv, charts used and top frustrations

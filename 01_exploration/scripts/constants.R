@@ -1,4 +1,5 @@
 #--- CONSTANTS ---#
+library(tidyverse)
 
 # Tools for Dataviz
 ToolsForDV_ArcGIS	<-	"ArcGIS"
@@ -144,8 +145,9 @@ tools_for_dv_type <- c(
 )
 
 tools_type_lookup <- tibble(tools_for_dv_vars, tools_for_dv_names, tools_for_dv_type) %>%
-  mutate(tools_for_dv_type <- as.factor(tools_for_dv_type),
-         tools_for_dv_names <- as.factor(tools_for_dv_names))
+  mutate(tools_for_dv_type = as.factor(tools_for_dv_type),
+         tools_for_dv_names = as.factor(tools_for_dv_names),
+         tools_for_dv_type = as.factor(tools_for_dv_type))
 
 
 # Charts used
@@ -276,12 +278,44 @@ top_frustrations_type <- c(
   "information" # TopFrustrationsDV_DataVolume
 )
 
+TopFrustrationsDV_LackTime_Short	<-	"Time"
+TopFrustrationsDV_LackDesignExpertise_Short	<-	"Design"
+TopFrustrationsDV_LackTechSkill_Short	<-	"Tech skill"
+TopFrustrationsDV_LearningNewToolsEtc_Short	<-	"New tools"
+TopFrustrationsDV_AccessingData_Short	<-	"Data access"
+TopFrustrationsDV_InfoOverload_Short	<-	"Info overload"
+TopFrustrationsDV_LackCollaboration_Short	<-	"Collab"
+TopFrustrationsDV_LackMentorship_Short	<-	"Mentorship"
+TopFrustrationsDV_LowDataLiteracy_Short	<-	"Data literacy"
+TopFrustrationsDV_DVNotRespected_Short	<-	"Respect DV"
+TopFrustrationsDV_ToolsTechLimits_Short	<-	"Tech tools limits"
+TopFrustrationsDV_NonVizActivity_Short	<-	"Non-viz activity"
+TopFrustrationsDV_DataVolume_Short	<-	"Data volume"
+
+top_frustrations_short <- c (
+  TopFrustrationsDV_LackTime_Short,
+  TopFrustrationsDV_LackDesignExpertise_Short,
+  TopFrustrationsDV_LackTechSkill_Short,
+  TopFrustrationsDV_LearningNewToolsEtc_Short,
+  TopFrustrationsDV_AccessingData_Short,
+  TopFrustrationsDV_InfoOverload_Short,
+  TopFrustrationsDV_LackCollaboration_Short,
+  TopFrustrationsDV_LackMentorship_Short,
+  TopFrustrationsDV_LowDataLiteracy_Short,
+  TopFrustrationsDV_DVNotRespected_Short,
+  TopFrustrationsDV_ToolsTechLimits_Short,
+  TopFrustrationsDV_NonVizActivity_Short,
+  TopFrustrationsDV_DataVolume_Short
+)
+
 top_frust_lookup <- tibble(top_frustrations_names, 
                            top_frustrations_vars,
-                           top_frustrations_type) %>%
+                           top_frustrations_type,
+                           top_frustrations_short) %>%
   mutate(top_frustrations_names = as.factor(top_frustrations_names),
          top_frustrations_vars = as.factor(top_frustrations_vars),
-         top_frustrations_type = as.factor(top_frustrations_type)) 
+         top_frustrations_type = as.factor(top_frustrations_type),
+         top_frustrations_short = as.factor(top_frustrations_short)) 
 
 # Top Issues
 TopIssuesDV_LackAwarenessOfDVImpact	<-	'Lack of awareness of the impact of dataviz'

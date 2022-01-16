@@ -101,13 +101,13 @@ tribe_frustrations <- tribe_frustrations_gather %>%
   ungroup() %>%
   mutate(top_frustrations_vars = fct_reorder(top_frustrations_vars, percN)) %>%
   left_join(top_frust_lookup, by = "top_frustrations_vars") %>%
-  mutate(top_frustrations_names = fct_reorder(top_frustrations_names,
+  mutate(top_frustrations_short = fct_reorder(top_frustrations_short,
                                               as.integer(top_frustrations_type)))
 
-frustrations_top10 <- tribe_frustrations %>% ungroup() %>%
+frustrations_top7 <- tribe_frustrations %>% ungroup() %>%
   group_by(top_frustrations_vars) %>%
   summarize(n = sum(n)) %>% ungroup() %>%
-  top_n(10, n) %>% select(top_frustrations_vars) %>%
+  top_n(7, n) %>% select(top_frustrations_vars) %>%
   pull()
 
 # Top Issues
