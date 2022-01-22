@@ -18,8 +18,8 @@ Among 2,165 survey respondents, 1,288 have provided all of the **4 major indicat
 
 **4 additional indicators:**
 
-* **Tools for DVS** - identifies the character for each persona
-* **Organizations / Industry** - distribution of the personas to which they are more endemic
+* **Tools for DVS** - identifies the character for each persona in terms of tool preference
+* **Organizations / Industry** - distribution of the personas to which they are more common
 * **Frustrations** - do each personas have varying frustrations?
 * **Issues** - socio-economic or dvs-specific issues for each persona
 
@@ -33,14 +33,14 @@ Do you lean more towards being a newbie or do you lean more towards being an exp
 This indicator uses the **YearsDVExperience** variable. **YearsWorkExperience** is secondary variable when no YearsDVExperience was provided.
 
 The median years of experience is **6 years**. Let's define you as a **Junior** if your DV experience is less than 6 years, while being a **Senior** if it is more than 6 years.
-```{r}
+```{r, echo=false}
 ggplot(experience_sorted, aes(YearsDVExperience, weight = n, fill = experience)) + 
   geom_bar() +
   coord_flip()
 
 ```
 
-```{r}
+```{r, echo=false}
 experience_sorted
 ```
 
@@ -78,14 +78,14 @@ Stories that helped on how they were classified:
 
 **58% are Analyticals while 15% are Creatives**
 
-```{r, fig.width=10, fig.height=1.5} 
+```{r, fig.width=10, fig.height=1.5, echo=false} 
 ggplot(role_tally %>% 
          mutate(Class = "class"), 
        aes(Class, nPerc, fill = RoleType)) +
   geom_bar(position = "stack", stat = "identity") +
   coord_flip()
 ```
-```{r} 
+```{r, echo=false} 
 role_tally
 
 ```
@@ -99,13 +99,13 @@ Let's define you as **humbly-paid** if your annual income falls below the median
 This indicator was taken from **PayAnnual** variable.
 
 Note: The terms *humbly-paid* and *well-paid* depicts the lower and upper halves of the distribution. These terms could be subjective to every DVS member depending on their cost of living in their respective countries and other such factors.
-```{r}
+```{r, echo=false}
 ggplot(income_sorted, aes(PayAnnual, weight = n, fill = income_group)) +
   geom_bar() +
   coord_flip()
 ```
 
-```{r}
+```{r, echo=false}
 income_sorted
 ```
 
@@ -153,7 +153,7 @@ Then, these points were added and compare the results whichever is higher. This 
 
 
 **Nearly 60% are Associates while around 37% are Independents**
-```{r, fig.width=10, fig.height=1.5}
+```{r, fig.width=10, fig.height=1.5, echo=false}
 ggplot(commitment_tally %>%
          mutate(Class = "class"), 
        aes(Class, nPerc, fill = Commitment)) +
@@ -161,7 +161,7 @@ ggplot(commitment_tally %>%
   coord_flip()
 ```
 
-```{r}
+```{r, echo=false}
 commitment_tally
 ```
 ## The 16 DVS Personas
@@ -169,10 +169,7 @@ commitment_tally
 Mix and matching these 4 major indicators, 16 unique personas were created. This is somewhat inspired from Myers-Briggs Type Indicator (MBTI) but with a DVS twist!
 
 **Percentage distribution of the 16 DVS personas**
-```{r}
-library("tidyverse")
-source("scripts/clean.R")
-
+```{r, echo=false}
 ggplot(tribe_tally %>% 
   mutate(group = paste(Experience, RoleType, IncomeGroup, Commitment)) %>%
   mutate(group = fct_reorder(group, n)) %>%
@@ -181,7 +178,7 @@ ggplot(tribe_tally %>%
   coord_flip()
 ```
 
-```{r}
+```{r, echo=false}
 tribe_tally
 ```
 
@@ -200,10 +197,8 @@ Meanwhile a Junior-Creative-Wellpaid-Independent is the rarest persona which is 
 * **Organizations / Industry** - distribution of the personas to which they are more endemic (**OrgSector_**)
 * **Frustrations** - do each personas have varying frustrations? (**TopFrustrationsDV_**)
 * **Issues** - socio-economic or dvs-specific issues for each persona (**TopIssuesDV_**)
-```{r}
-source("scripts/add_indicators.R")
+```{r, echo=false}
 tribe_tools
-tribe_charts
 tribe_frustrations
 ```
 
@@ -211,10 +206,7 @@ tribe_frustrations
 
 Let's look at how each persona has more prefered tools than the others.
 
-```{r, fig.width=12, fig.height=10}
-tribe_tools
-tools_top10
-
+```{r, fig.width=12, fig.height=10, echo=false}
 ggplot(tribe_tools %>% 
          filter(tools_for_dv_vars %in% tools_top10), 
        aes(tools_for_dv_names, percN, fill = tools_for_dv_type)) +
@@ -231,7 +223,7 @@ ggplot(tribe_tools %>%
 * Creative-Wellpaid-Associates are D3.js power users! Who said creatives can't code?
 * Looks so obvious that Illustrator is a creative's bestfriend, except for a creative-wellpaid-independent which a Junior would prefer Pen & paper and Senior uhm... Excel? strange.
 
-```{r, fig.width = 10, fig.height = 10}
+```{r, fig.width = 10, fig.height = 10, echo=false}
 # ggplot(tribe_tools %>% 
 #          ungroup() %>%
 #          group_by(tribe_desc) %>%
@@ -244,9 +236,7 @@ ggplot(tribe_tools %>%
 ### How common each personas per industry?
 
 Different personas were dispersed in different industries asymmetrically. This visual tool could be beneficial if you are eyeing for a specific persona you want to be in. A rare persona in that industry could either indicate whether it has a difficult prerequisites which makes these persona quite rare.
-```{r, fig.width = 12, fig.height = 10}
-tribe_orgsec
-
+```{r, fig.width = 12, fig.height = 10, echo=false}
 ggplot(tribe_orgsec, aes(org_sector_names, n, fill = org_sector_category)) +
   geom_col() +
   coord_flip() +
@@ -272,7 +262,7 @@ Top 7 frustrations were picked among the 13 in the survey. These were encoded in
 * **Tech tools limit**: Technical limitations of the tools
 * **Non-viz activity**: Too much effort spent on non-viz activity
 
-```{r, fig.width = 12, fig.height = 10}
+```{r, fig.width = 12, fig.height = 10, echo=false}
 ggplot(tribe_frustrations %>%
          filter(top_frustrations_vars %in% frustrations_top7), 
        aes(top_frustrations_short, percN, fill = top_frustrations_type)) +
@@ -291,9 +281,7 @@ ggplot(tribe_frustrations %>%
 
 ### What issues each persona feel should be addressed?
 
-```{r, fig.width = 12, fig.height = 10}
-tribe_issues
-
+```{r, fig.width = 12, fig.height = 10, echo=false}
 ggplot(tribe_issues %>%
          filter(top_issues_vars %in% top_issues_top10), 
        aes(top_issues_names, percN, fill = top_issues_type)) +
@@ -302,5 +290,12 @@ ggplot(tribe_issues %>%
   facet_wrap(vars(tribe_desc))
 ```
 #### Observations
+
 * Unanimously lack of literacy for majority regardless of persona. Second to it is the lack of awareness of impact of data visualization.
 * Despite the slight differences in frustrations for every persona, all the personas surprisingly seem to unanimously agree on the same issues.
+
+
+## Realizations
+* Analyticals are far well-paid than Creatives and it is quite obvious.
+* Seniority is a factor for a high paying job but it is not impossible to be a junior but earn very-well as a data-viz practitioner. It might be a difficult path but not impossible.
+* There is a notable transition of tools usage popularity between generations. For example, between Excel to Tableau if we try to compare Juniors and Seniors.

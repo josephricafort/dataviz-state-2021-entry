@@ -1,6 +1,14 @@
 #--- CONSTANTS ---#
 library(tidyverse)
 
+#--- Main Indicators ---#
+# Analysts vs creatives
+creative_types <- c("Designer", "Journalist", "Teacher", "Cartographer", # For main dataset
+                    "Academic/Teacher", "Student") # For tasktime dataset
+analytical_types <- c("Analyst", "Developer", "Scientist", "Engineer", "Leadership (Manager, Director, VP, etc.)")
+ambiguous_types <- c("None of these describes my role", "")
+
+
 # Tools for Dataviz
 ToolsForDV_ArcGIS	<-	"ArcGIS"
 ToolsForDV_D3	<-	"D3.js"
@@ -432,3 +440,24 @@ org_sector_lookup <- tibble(org_sector_names,
   mutate(org_sector_names = as.factor(org_sector_names),
          org_sector_vars = as.factor(org_sector_vars),
          org_sector_category = as.factor(org_sector_category))
+
+
+# Persona Name
+persona_names <- c(
+  "The Analyst Apprentice",
+  "The Senior BI Analyst",
+  "The Professor",
+  "The Hackathon-er",
+  "The Ironviz Champ",
+  "The Data Journalist",
+  "The Scientist Specialist",
+  "The PhD Student",
+  "The Infographics Geek",
+  "The Graphics Editor",
+  "The Master Prototyper",
+  "The Tableau Craftsperson",
+  "The Creative Coder",
+  "The Studio Founder",
+  "The Excel Connoiseur",
+  "The Generative Artist"
+)

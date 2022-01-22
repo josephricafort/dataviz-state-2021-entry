@@ -1,4 +1,6 @@
 # Explore additional indicators
+library("tidyverse")
+library("jsonlite")
 
 source("scripts/clean.R")
 tribe
@@ -170,4 +172,11 @@ tribe_orgsec <- tribe_orgsec_gather %>%
   left_join(org_sector_lookup, by = "org_sector_vars") %>%
   mutate(org_sector_names = fct_reorder(org_sector_names,
                                           as.integer(org_sector_category)))
+
+
+#--- OUTPUT ALL DATA FOR USE ---#
+toJSON(tribe_tools) %>% write("data/processed/tribe_tools.json")
+toJSON(tribe_orgsec) %>% write("data/processed/tribe_orgsec.json")
+toJSON(tribe_frustrations) %>% write("data/processed/tribe_frustrations.json")
+toJSON(tribe_issues) %>% write("data/processed/tribe_issues.json")
 

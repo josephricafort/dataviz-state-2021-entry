@@ -1,8 +1,12 @@
 library("tidyverse")
+library("jsonlite")
 
 source("scripts/utils.R")
 grouped_median
 source("scripts/constants.R")
+creative_types
+analytical_types
+ambiguous_types
 tools_for_dv_names
 tools_for_dv_vars
 charts_used_names
@@ -13,6 +17,7 @@ top_issues_names
 top_issues_vars
 org_sector_names
 org_sector_vars
+persona_names
 
 path <-"data/raw/"
 raw_list <- list.files(path)
@@ -55,10 +60,6 @@ main2021 <- raw_data_list[2] %>% as.data.frame() %>%
 
 # Role (Analytical vs Creative)
 # Variables: RoleAsEmployee (priority), RoleAsFreelance (if priority not available)
-
-creative_types <- c("Designer", "Journalist", "Teacher", "Cartographer")
-analytical_types <- c("Analyst", "Developer", "Scientist", "Engineer", "Leadership (Manager, Director, VP, etc.)")
-ambiguous_types <- c("None of these describes my role", "")
 
 role <- main2021 %>% select(RoleAsEmployee, RoleAsFreelance) %>%
   mutate(RoleAny = if_else(RoleAsEmployee != "", RoleAsEmployee, RoleAsFreelance)) %>%
@@ -297,5 +298,16 @@ tribe_tally <- tribe_clean %>%
   count() %>% 
   arrange(desc(n)) %>%
   ungroup() %>%
-  mutate(nPerc = n/sum(n) * 100)
+  mutate(nPerc = n/sum(n) * 100) %>%
+  bind_cols(PersonaName = persona_names)
+  
 
+
+#--- OUTPUT ALL DATA FOR USE ---#
+toJSON(experience_sorted) %>% write("data/processed/experience_sorted.json")
+toJSON(role_tally) %>% write("data/processed/role_tally.json")
+toJSON(income_sorted) %>% write("data/processed/income_sorted.json")
+toJSON(commitment_tally) %>% write("data/processed/commitment_tally.json")
+toJSON(tribe_tally) %>% write("data/processed/tribe_tally.json")
+
+# 
