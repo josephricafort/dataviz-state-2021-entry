@@ -299,7 +299,11 @@ tribe_tally <- tribe_clean %>%
   arrange(desc(n)) %>%
   ungroup() %>%
   mutate(nPerc = n/sum(n) * 100) %>%
-  bind_cols(PersonaName = persona_names)
+  bind_cols(PersonaName = persona_names) %>%
+  # Standardize with JS
+  rename(experience = Experience, roleType = RoleType,
+         incomeGroup = IncomeGroup, commitment = Commitment,
+         personaName = PersonaName)
   
 
 
