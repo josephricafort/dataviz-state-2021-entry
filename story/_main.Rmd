@@ -171,7 +171,7 @@ Mix and matching these 4 major indicators, 16 unique personas were created. This
 **Percentage distribution of the 16 DVS personas**
 ```{r, echo=false}
 ggplot(tribe_tally %>% 
-  mutate(group = paste(experience, roleType, incomeGroup, commitment)) %>%
+  mutate(group = paste(Experience, RoleType, IncomeGroup, Commitment)) %>%
   mutate(group = fct_reorder(group, n)) %>%
   mutate(class = "class"), aes(reorder(group, nPerc), nPerc, fill = class)) + 
   geom_col() +
@@ -242,7 +242,7 @@ ggplot(tribe_orgsec, aes(org_sector_names, n, fill = org_sector_category)) +
   coord_flip() +
   facet_wrap(vars(tribe_desc))
 ```
-**Observations**
+**Observations (and a few rants)**
 
 * Junior-Analytical-Humblypaid-Associate seems to visually occupy a lot of the bars followed by Senior-Analytical-Wellpaid-Associate. These two personas earlier were ranked as the first and second most common personas.
 * Almost 50% of the Senior-Analytical-Humblypaid-Associates identified themselves coming from the Academe.
@@ -299,3 +299,6 @@ ggplot(tribe_issues %>%
 * Analyticals are far well-paid than Creatives and it is quite obvious.
 * Seniority is a factor for a high paying job but it is not impossible to be a junior but earn very-well as a data-viz practitioner. It might be a difficult path but not impossible.
 * There is a notable transition of tools usage popularity between generations. For example, between Excel to Tableau if we try to compare Juniors and Seniors.
+
+<!--chapter:end:index.Rmd-->
+
