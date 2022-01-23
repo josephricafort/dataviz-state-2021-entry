@@ -3,18 +3,9 @@ title: "Which DVS persona are you? (Explainer)"
 output: html_notebook
 ---
 
-BY JOSEPH RICAFORT
-
-If you haven't taken the quiz yet, know which DVS persona are you by taking the [quiz here](https://dvs-persona-quiz.thelostkite.com/).
-
 The DVS community is a diverse community made up of dataviz practicioners from different demographics and experiences. Have you ever wondered what could be the different possible personas that are made up of this community and which of these personas do you identify yourself the closest to?
 
 Let's look at the 4 different indicators and mix & match them to create different personas of what the DVS population are made out of.
-
-![The 16 DVS personas](persona-avatars.svg)
-[Cartoon Vectors by Vecteezy](https://www.vecteezy.com/free-vector/cartoon)
-
-*Disclaimer: The naming for every persona (e.g. The Analyst Intern, The Journalist, etc..) were inferred from the data as close as possible but might not truly represent and characterize the majority of those subgroups. It is also a means to easily identify the subgroups with this naming convention.*
 
 Among 2,165 survey respondents, 1,288 have provided all of the **4 major indicators** and have answered at least one of the **4 additional indicators**.
 
@@ -304,7 +295,7 @@ ggplot(tribe_issues %>%
 * Despite the slight differences in frustrations for every persona, all the personas surprisingly seem to unanimously agree on the same issues.
 
 
-## Reflections
-* Analyticals are far well-paid than Creatives.
+## Realizations
+* Analyticals are far well-paid than Creatives and it is quite obvious.
 * Seniority is a factor for a high paying job but it is not impossible to be a junior but earn very-well as a data-viz practitioner. It might be a difficult path but not impossible.
 * There is a notable transition of tools usage popularity between generations. For example, between Excel to Tableau if we try to compare Juniors and Seniors.
