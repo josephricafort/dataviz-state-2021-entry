@@ -22,3 +22,4 @@ grouped_median <- function(frequencies, intervals, sep = NULL, trim = NULL) {
   
   unname(L + (n_2 - cf2)/f * h)
 }
+

@@ -132,7 +132,8 @@ experience_sorted <- experience_tally %>%
     experience_tally$YearsDVExperience, 
     experience_tally$YearsDVExperience %>% as.character())) %>%
   mutate(experience = if_else(row_number() <= yearsexp_med_idx, "junior", "senior") %>%
-           as.factor())
+           as.factor()) %>%
+  mutate(nPerc = round(n/sum(n) * 100, 2))
 
 
 # Income Group (Commoner vs Elite)
@@ -177,7 +178,8 @@ well_paid <- income_tally %>% filter(!(PayAnnual %in% humbly_paid)) %>% select(P
 income_sorted <- income_tally %>%
   mutate(PayAnnual = fct_relevel(income_tally$PayAnnual,
                                  income_tally$PayAnnual %>% as.character())) %>%
-  mutate(income_group = if_else(row_number() <= income_med_idx, "humblypaid", "wellpaid"))
+  mutate(income_group = if_else(row_number() <= income_med_idx, "humblypaid", "wellpaid")) %>%
+  mutate(nPerc = round(n/sum(n) * 100, 2))
 
 
 # Commitment (Independent vs Associate)
