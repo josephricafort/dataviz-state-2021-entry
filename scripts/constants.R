@@ -444,20 +444,20 @@ org_sector_lookup <- tibble(org_sector_names,
 
 # Persona Name
 persona_names <- c(
-  "The Analyst Apprentice",
+  "The Analyst Intern",
   "The Senior BI Analyst",
   "The Professor",
   "The Hackathon-er",
   "The Business Analyst",
-  "The Journalist",
+  "The Data Journalist",
   "The ML Consultant",
-  "The PhD Student",
+  "The Gov. Statistician",
   "The Infographics Geek",
   "The Graphics Editor",
-  "The Master Prototyper",
+  "The Science Illustrator",
   "The Tableau Champ",
   "The Creative Coder",
   "The Studio Founder",
-  "The Creative Techie",
+  "The Tech Pioneer",
   "The Generative Artist"
 )
