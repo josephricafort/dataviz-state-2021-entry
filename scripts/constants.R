@@ -457,7 +457,7 @@ persona_names <- c(
   "The Science Illustrator",
   "The Tableau Champ",
   "The Creative Coder",
-  "The Studio Founder",
+  "The Design Director",
   "The Tech Pioneer",
   "The Generative Artist"
 )
