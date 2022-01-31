@@ -306,7 +306,6 @@ tribe_tally <- tribe_clean %>%
   rename(experience = Experience, roleType = RoleType,
          incomeGroup = IncomeGroup, commitment = Commitment,
          personaName = PersonaName)
-  
 
 
 #--- OUTPUT ALL DATA FOR USE ---#
@@ -315,5 +314,3 @@ toJSON(role_tally) %>% write("data/processed/role_tally.json")
 toJSON(income_sorted) %>% write("data/processed/income_sorted.json")
 toJSON(commitment_tally) %>% write("data/processed/commitment_tally.json")
 toJSON(tribe_tally) %>% write("data/processed/tribe_tally.json")
-
-# 
