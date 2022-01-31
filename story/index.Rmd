@@ -1,5 +1,5 @@
 ---
-title: "Which DVS persona are you? (Explainer)"
+title: "Explainer: Which DVS persona are you?"
 output: html_notebook
 ---
 
@@ -54,7 +54,8 @@ ggplot(tribe_tally %>%
 
 ```{r, echo=false}
 tribe_tally %>%
-  select(-n) %>% rename(percent = nPerc)
+  select(-n) %>% rename(percent = nPerc) %>%
+  mutate(percent = round(percent, 2))
 ```
 
 25% of the DVS community is a Junior-Analytical-Humblypaid-Associate, the most common among all personas. It is then followed by a Senior-Analytical-Humblypaid-Associate.
@@ -337,5 +338,24 @@ ggplot(commitment_tally %>%
     x = "",
     y = "Percent of the Respondents"
   )
+```
+
+```{css, echo = FALSE}
+@import url("https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,500;0,600;1,500;1,700&family=Work+Sans:ital,wght@0,300;0,400;0,500;1,500&display=swap");
+
+  h1,
+  h2,
+  h3, 
+  h4 {
+    font-family: "Crimson Pro", serif;
+  }
+
+  p,
+  input,
+  td,
+  li {
+    font-family: "Work Sans", sans-serif;
+  }
+
 ```
 
