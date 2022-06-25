@@ -77,7 +77,47 @@ for(row_n in 1:nrow(tribe_tally)){
 }
 
 
+###- All personas in single chart -###
 
+# Tribe tools #
+ggplot(tribe_tools %>% 
+         filter(tools_for_dv_vars %in% tools_top10), 
+       aes(tools_for_dv_names, percN, fill = tools_for_dv_type)) +
+  geom_bar(width = 1, stat = "identity", color = "white") + 
+  # coord_flip() +
+  coord_polar() + 
+  facet_wrap(vars(tribe_desc)) +
+  labs(
+    x = "",
+    y = "Percent of the Respondents",
+    fill = "Tools for DV Category"
+  )
 
+ggsave(
+  "charttools-all.svg",
+  last_plot(),
+  "svg",
+  "plots/charttools",
+  width = 18,
+  height = 12
+)
 
+# Tribe industries #
+ggplot(tribe_orgsec, aes(org_sector_names, n, fill = org_sector_category)) +
+  geom_col() +
+  coord_flip() +
+  facet_wrap(vars(tribe_desc)) +
+  labs(
+    x = "Industry",
+    y = "Number of respondents",
+    fill = "Industry Category"
+  )
 
+ggsave(
+  "chartindustry-all.svg",
+  last_plot(),
+  "svg",
+  "plots/chartindustry",
+  width = 18,
+  height = 12
+)
